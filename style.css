@@ -1,0 +1,196 @@
+* {
+  color: white;
+}
+:root {
+  --bg-anim: #000;
+  --gold-anim: #c6a84a;
+  --gold-weak-anim: rgba(198, 168, 74, 0.14);
+  --glass-anim: rgba(255, 255, 255, 0.02);
+}
+
+.background-animation-system {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* Back to background */
+  background: #000;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+/* Only make the main structural containers transparent, but allow specific backgrounds to work */
+body,
+#MainContent,
+.shopify-section,
+.funnel-section,
+.gradient {
+  background-color: transparent !important;
+}
+
+/* Ensure cards and specific containers can keep their background */
+.glass-card,
+.stats-video-container,
+.stat-item {
+  position: relative;
+  z-index: 1;
+}
+
+/* Canvas (particles) sits behind content but above grid for depth */
+#particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* refined grid — subtle and centered mask */
+.vivid-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image:
+    linear-gradient(to right, var(--gold-weak-anim) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--gold-weak-anim) 1px, transparent 1px);
+  background-size: 56px 56px;
+  opacity: 0.22;
+  mask-image: radial-gradient(
+    circle at center,
+    rgba(0, 0, 0, 1) 25%,
+    transparent 85%
+  );
+  transform: scale(1.02);
+}
+
+/* glows — larger, softer, drifting */
+.gold-aura {
+  position: absolute;
+  width: 760px;
+  height: 760px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(198, 168, 74, 0.36) 0%,
+    rgba(198, 168, 74, 0.12) 20%,
+    transparent 60%
+  );
+  filter: blur(90px);
+  z-index: 2;
+  mix-blend-mode: screen;
+  transform: translate3d(0, 0, 0);
+}
+.gold-aura-top {
+  top: -240px;
+  left: -120px;
+  animation: glow-drift-1 18s ease-in-out infinite;
+}
+.gold-aura-bottom {
+  bottom: -240px;
+  right: -120px;
+  background: radial-gradient(
+    circle at 70% 70%,
+    rgba(198, 168, 74, 0.28) 0%,
+    rgba(198, 168, 74, 0.08) 25%,
+    transparent 60%
+  );
+  animation: glow-drift-2 20s ease-in-out infinite;
+  animation-delay: -6s;
+}
+
+/* animated thin gold streaks (SVG path stroke dash) */
+.gold-streaks {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+}
+.gold-streaks svg {
+  width: 140%;
+  height: 140%;
+  transform: translate(-10%, -10%);
+}
+.streak {
+  stroke: linear-gradient(var(--gold-anim), #fff);
+  stroke-linejoin: round;
+  stroke-opacity: 0.9;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: streak-slide 10s linear infinite;
+  filter: blur(6px);
+}
+
+/* subtle grain overlay for filmic premium look */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='f'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23f)' opacity='0.04' /%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  transform: scale(1.02);
+}
+
+/* animations */
+@keyframes glow-drift-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(80px, 60px, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+@keyframes glow-drift-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-90px, -50px, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+@keyframes streak-slide {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* better mobile performance: tone down */
+@media (max-width: 800px) {
+  .gold-aura {
+    width: 520px;
+    height: 520px;
+    filter: blur(70px);
+  }
+  .vivid-grid {
+    background-size: 42px 42px;
+    opacity: 0.12;
+  }
+  .grain {
+    opacity: 0.02;
+  }
+}
+
+/* accessibility: respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .gold-aura,
+  .gold-streaks,
+  #particles {
+    animation: none !important;
+    transition: none !important;
+  }
+  .streak {
+    stroke-dashoffset: 0;
+    filter: none;
+  }
+}
